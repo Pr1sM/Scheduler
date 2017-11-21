@@ -45,10 +45,6 @@ public struct System {
         }
     }
     
-    public func exportToCSV() {
-        
-    }
-    
     public mutating func schedule() throws {
         currentTime = 0.0;
         var inProgressLinks = [ScheduleLink]()

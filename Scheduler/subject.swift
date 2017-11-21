@@ -44,7 +44,6 @@ public struct Subject {
     }
     
     public var eventsCompleted:Bool {
-        print("Subject \(name): \(closedEvents.count)/\(events.count) events completed")
         return closedEvents.count == events.count
     }
     

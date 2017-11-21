@@ -49,7 +49,3 @@ print("\nTiming Summary Below")
 for subject in scheduler.subjects {
     print(subject.timingSummary)
 }
-
-print("\nCSV Format\n")
-
-
