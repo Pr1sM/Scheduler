@@ -62,26 +62,26 @@ public struct System {
             }
         }
         
-        print("Current Time: \(currentTime)")
+        log.d("Current Time: \(currentTime)")
         
         while subjects.first(where: { return !$0.eventsCompleted }) != nil {
             guard currentTime < 12.0*60 else {
-                print("\tSchedule Time Limit Reached -- No Schedule found!")
+                log.d("\tSchedule Time Limit Reached -- No Schedule found!")
                 break
             }
             
             
             guard !subjectQueue.isEmpty else {
                 currentTime += 7.5
-                print("Current Time: \(currentTime)")
-                print("\tSubject Queue empty, releasing backlog and links")
+                log.d("Current Time: \(currentTime)")
+                log.d("\tSubject Queue empty, releasing backlog and links")
                 releaseBacklog()
                 releaseAvailableLinks()
                 continue
             }
             
             guard subjectQueue.front!.openEvents.first(where: { !resourceQueues[$0.resourceType]!.isEmpty }) != nil else {
-                print("\tSubject: \(subjectQueue.front!.name) moved to backlog")
+                log.t("\tSubject: \(subjectQueue.front!.name) moved to backlog")
                 subjectBacklogQueue.enqueue(subjectQueue.dequeue()!)
                 continue
             }
@@ -93,11 +93,9 @@ public struct System {
             let link = try reserveResource(resource, forSubject: subject, andEvent: event)
             
             inProgressLinks.append(link)
-            print("\tReserved Link:")
-            printLink(link)
+            log.t("\tReserved Link:")
+            logLink(link)
         }
-        
-        
     }
     
     fileprivate mutating func releaseScheduleLink(_ link:ScheduleLink) -> Bool {
@@ -107,8 +105,8 @@ public struct System {
                     subjects[idx].addEventTime(currentTime - link.2.time, forEventWithId: link.2.id)
                     subjectQueue.enqueue(subjects[idx])
                     resourceQueues[link.0.type]!.enqueue(link.0)
-                    print("\tReleased link:")
-                    printLink(link)
+                    log.t("\tReleased link:")
+                    logLink(link)
                     return true
                 }
             }
@@ -124,7 +122,7 @@ public struct System {
         return (resource, subject, event, currentTime + event.time)
     }
     
-    fileprivate func printLink(_ link:ScheduleLink) {
-        print("\t\tR: \(link.0.name), S: \(link.1.name), E: \(link.2.resourceType.toString()), T: \(link.3)")
+    fileprivate func logLink(_ link:ScheduleLink) {
+        log.t("\t\tR: \(link.0.name), S: \(link.1.name), E: \(link.2.resourceType.toString()), T: \(link.3)")
     }
 }

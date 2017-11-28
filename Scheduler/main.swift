@@ -40,12 +40,15 @@ let testSubjects = [
     Subject(id: 12, number: 12, name: "Team 12", events: testEvents)
 ]
 
+var log = Logger.shared
+log.level = .normal
+
 var scheduler = System(resources: testResources, subjects: testSubjects)
 
 try scheduler.schedule()
 
-print("\nTiming Summary Below")
+log.n("Timing Summary Below")
 
 for subject in scheduler.subjects {
-    print(subject.timingSummary)
+    log.n(subject.timingSummary)
 }

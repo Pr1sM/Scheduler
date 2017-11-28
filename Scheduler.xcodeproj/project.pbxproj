@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C44351F81FC8BD3F00A67828 /* logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44351F71FC8BD3F00A67828 /* logger.swift */; };
 		C47C744D1FB51025004263AC /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47C744C1FB51025004263AC /* main.swift */; };
 		C47C74541FB5106F004263AC /* subject.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47C74531FB5106F004263AC /* subject.swift */; };
 		C47C74561FB510D8004263AC /* event.swift in Sources */ = {isa = PBXBuildFile; fileRef = C47C74551FB510D8004263AC /* event.swift */; };
@@ -29,6 +30,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C44351F71FC8BD3F00A67828 /* logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = logger.swift; sourceTree = "<group>"; };
 		C47C74491FB51025004263AC /* Scheduler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Scheduler; sourceTree = BUILT_PRODUCTS_DIR; };
 		C47C744C1FB51025004263AC /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		C47C74531FB5106F004263AC /* subject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = subject.swift; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 				C47C74591FB51107004263AC /* queue.swift */,
 				C47C745B1FB51160004263AC /* system.swift */,
 				C47C745D1FB513F0004263AC /* timing.swift */,
+				C44351F71FC8BD3F00A67828 /* logger.swift */,
 			);
 			path = Scheduler;
 			sourceTree = "<group>";
@@ -145,6 +148,7 @@
 				C47C74581FB510ED004263AC /* resource.swift in Sources */,
 				C47C744D1FB51025004263AC /* main.swift in Sources */,
 				C47C74561FB510D8004263AC /* event.swift in Sources */,
+				C44351F81FC8BD3F00A67828 /* logger.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +280,7 @@
 				C47C74521FB51025004263AC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
