@@ -36,8 +36,12 @@ public struct Subject {
         
         var concat = "\(number) - \(name)\n"
         
-        for (key, val) in eventTimes {
-            concat += "\t\(val): \(events.first(where: { $0.id == key })!.resourceType.toString())\n"
+        let times = eventTimes.values.sorted(by: <)
+        
+        for time in times {
+            let eventId = eventTimes.first(where: { $0.value == time })!.key
+            let resource = events.first(where: { $0.id == eventId })!.resourceType.toString()
+            concat += "\t\(String(format: "%5.1f", time)): \(resource)\n"
         }
         
         return concat
