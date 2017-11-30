@@ -47,8 +47,17 @@ var scheduler = System(resources: testResources, subjects: testSubjects)
 
 try scheduler.schedule()
 
-log.n("Timing Summary Below")
+log.d("Timing Summary Below")
 
 for subject in scheduler.subjects {
-    log.n(subject.timingSummary)
+    log.d(subject.timingSummary)
 }
+
+let timings = try scheduler.getTimings()
+
+for timing in timings {
+    log.d(timing.description)
+}
+
+scheduler.exportCSV()
+

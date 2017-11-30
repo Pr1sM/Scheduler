@@ -15,18 +15,23 @@ public enum ScheduleError: Error {
 public struct System {
     public var resources:[Resource]
     public var subjects:[Subject]
-    
+
     fileprivate var subjectQueue:Queue<Subject>
     fileprivate var resourceQueues:Dictionary<ResourceType, Queue<Resource>>
     fileprivate var currentTime:Float
+    fileprivate var startTime:Float
+    fileprivate var endTime:Float
+    fileprivate var timings:[Timing]
     
     fileprivate typealias ScheduleLink = (Resource, Subject, Event, Float)
-    
     
     public init(resources:[Resource], subjects:[Subject]) {
         self.resources = resources
         self.subjects = subjects
         self.currentTime = 0.0
+        self.startTime = 0.0
+        self.endTime = 0.0
+        self.timings = []
         
         subjectQueue = Queue<Subject>()
         resourceQueues = [
@@ -45,8 +50,19 @@ public struct System {
         }
     }
     
+    public mutating func getTimings() throws -> [Timing] {
+        if timings.isEmpty {
+            try schedule()
+        }
+        
+        return timings
+    }
+    
     public mutating func schedule() throws {
         currentTime = 0.0;
+        startTime = 0.0;
+        endTime = 0.0;
+        timings.removeAll()
         var inProgressLinks = [ScheduleLink]()
         var subjectBacklogQueue = Queue<Subject>()
         
@@ -92,10 +108,54 @@ public struct System {
             
             let link = try reserveResource(resource, forSubject: subject, andEvent: event)
             
+            timings.append(Timing(startTime: currentTime, endTime: currentTime + event.time, resource: resource, subject: subject))
+            
             inProgressLinks.append(link)
             log.t("\tReserved Link:")
             logLink(link)
         }
+        
+        endTime = currentTime;
+        
+        log.n("Schedule created from \(startTime) to \(endTime)")
+    }
+    
+    public func exportCSV() {
+        var time:Float = 0.0
+        
+        var export = "Time"
+        for resource in resources {
+            export += ",\(resource.name)"
+        }
+        export += "\n"
+        
+        while(time < endTime) {
+            
+            let timingsAtCurrentTime = timings.filter({ $0.startTime == time })
+            var sortedTimings = [Timing]()
+            for resource in resources {
+                if let entry = timingsAtCurrentTime.first(where: { $0.resourceRequired == resource }) {
+                    sortedTimings.append(entry)
+                } else {
+                    sortedTimings.append(Timing.blank)
+                }
+                
+            }
+            
+            export += "\(time)"
+            for entry in sortedTimings {
+                export += entry.isBlank ? "," : ",\(entry.subjectRequired.number)"
+            }
+            export += "\n"
+            
+            time += 7.5
+        }
+        
+        let path = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("export.csv")
+        
+        log.n("Exporting to \(path.absoluteString)")
+        
+        try? export.write(to: path, atomically: true, encoding: .utf8)
     }
     
     fileprivate mutating func releaseScheduleLink(_ link:ScheduleLink) -> Bool {
