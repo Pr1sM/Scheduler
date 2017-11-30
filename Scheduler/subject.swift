@@ -71,4 +71,10 @@ public struct Subject {
             }
         }
     }
+    
+    public static func == (left:Subject, right:Subject) -> Bool {
+        return left.id == right.id
+    }
+    
+    public static let blank = Subject(id: -1, number: -1, name: "", events: [])
 }

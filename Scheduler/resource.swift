@@ -33,6 +33,11 @@ public struct Resource {
         self.type = type
     }
     
+    public static func == (left:Resource, right:Resource) -> Bool {
+        return left.name == right.name && left.type == right.type
+    }
+    
+    public static let blank = Resource(name: "", type: .none)
     public static let robotGameTable1A = Resource(name: "Table 1A", type: .robotGame)
     public static let robotGameTable1B = Resource(name: "Table 1B", type: .robotGame)
     public static let robotGameTable2A = Resource(name: "Table 2A", type: .robotGame)
