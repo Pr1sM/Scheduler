@@ -120,6 +120,105 @@ public struct System {
         log.n("Schedule created from \(startTime) to \(endTime)")
     }
     
+    public mutating func schedule2() {
+        currentTime = 0.0;
+        startTime = 0.0;
+        endTime = 0.0;
+        
+        var linkDictionary:[Float:[ScheduleLink]] = [Float:[ScheduleLink]]()
+        var subjectBacklogQueue = Queue<Subject>()
+        
+        func resourcesAvailable() -> Bool {
+            for (_, val) in resourceQueues {
+                if !val.isEmpty {
+                    return true
+                }
+            }
+            return false
+        }
+        
+        func reserveResource(_ resource:Resource, forSubject subject:Subject, andEvent event:Event, atTime time:Float) throws {
+            guard subject.openEvents.contains(where: { return $0 == event }) else {
+                throw ScheduleError.eventMismatch(event: event, givenEvents: subject.events)
+            }
+            
+            let link = (resource, subject, event, time + event.time)
+            if linkDictionary[time+event.time] != nil {
+                linkDictionary[time+event.time]!.append(link)
+                log.t("\tAdded link to dictionary")
+            } else {
+                linkDictionary[time+event.time] = [link]
+                log.t("\tAdded new link to dictionary")
+            }
+        }
+        
+        func releaseLink(_ link: ScheduleLink) {
+            if(currentTime == link.3) {
+                for idx in 0..<subjects.count {
+                    if(subjects[idx].id == link.1.id) {
+                        subjects[idx].addEventTime(currentTime - link.2.time, forEventWithId: link.2.id)
+                        subjectQueue.enqueue(subjects[idx])
+                        resourceQueues[link.0.type]!.enqueue(link.0)
+                        log.t("\tReleased link:")
+                        logLink(link)
+                    }
+                }
+            }
+        }
+        
+        while subjects.first(where: { return !$0.eventsCompleted }) != nil {
+            guard currentTime < 12.0*60 else {
+                log.d("\tSchedule Time Limit Reached -- No Schedule found!")
+                break
+            }
+            
+            if let links = linkDictionary[currentTime] {
+                for link in links {
+                    _ = releaseScheduleLink(link)
+                }
+            }
+            
+            // Reserve Resources
+            
+            guard !subjectQueue.isEmpty && resourcesAvailable() else {
+                currentTime += 7.5
+                log.d("Current Time: \(currentTime)")
+                continue
+            }
+            
+            repeat {
+                if let front = subjectQueue.front {
+                    if front.openEvents.first(where: { !resourceQueues[$0.resourceType]!.isEmpty }) != nil {
+                        log.t("\tSubject: \(subjectQueue.front!.name) moved to backlog")
+                        subjectBacklogQueue.enqueue(subjectQueue.dequeue()!)
+                    } else {
+                        break
+                    }
+                }
+            } while !subjectQueue.isEmpty
+            
+            if !subjectQueue.isEmpty {
+                let subject = subjectQueue.dequeue()!
+                let event = subject.openEvents.first(where: { !resourceQueues[$0.resourceType]!.isEmpty })!
+                let resource = resourceQueues[event.resourceType]!.dequeue()!
+                
+                try? reserveResource(resource, forSubject: subject, andEvent: event, atTime: currentTime)
+                
+                timings.append(Timing(startTime: currentTime, endTime: currentTime + event.time, resource: resource, subject: subject))
+                
+                log.t("\tReserved Link:")
+                logLink((resource, subject, event, currentTime + event.time))
+            }
+            
+            currentTime += 7.5
+            
+            while !subjectBacklogQueue.isEmpty {
+                subjectQueue.enqueue(subjectBacklogQueue.dequeue()!)
+            }
+        }
+        
+    }
+    
     public func exportCSV() {
         var time:Float = 0.0
         
